@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-tess
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-tess
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ .Release.Name }}-tess
+    spec:
+      containers:
+      - env:
+        - name: ADMIN_EMAIL
+          valueFrom:
+            configMapKeyRef:
+              key: ADMIN_EMAIL
+              name: {{ .Release.Name }}-env
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: ADMIN_PASSWORD
+              name: {{ .Release.Name }}-env
+        - name: ADMIN_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              key: ADMIN_USERNAME
+              name: {{ .Release.Name }}-env
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: DB_HOST
+              name: {{ .Release.Name }}-env
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: DB_NAME
+              name: {{ .Release.Name }}-env
+        - name: DB_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: DB_PASSWORD
+              name: {{ .Release.Name }}-env
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: DB_PORT
+              name: {{ .Release.Name }}-env
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              key: DB_USER
+              name: {{ .Release.Name }}-env
+        - name: PREFIX
+          valueFrom:
+            configMapKeyRef:
+              key: PREFIX
+              name: {{ .Release.Name }}-env
+        - name: RAILS_ENV
+          value: production
+        - name: RAILS_LOG_TO_STDOUT
+          value: "true"
+        - name: RAILS_SERVE_STATIC_FILES
+          value: "true"
+        - name: REDIS_TEST_URL
+          valueFrom:
+            configMapKeyRef:
+              key: REDIS_TEST_URL
+              name: {{ .Release.Name }}-env
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              key: REDIS_URL
+              name: {{ .Release.Name }}-env
+        - name: SECRET_KEY_BASE
+          valueFrom:
+            configMapKeyRef:
+              key: SECRET_KEY_BASE
+              name: {{ .Release.Name }}-env
+        - name: SOLR_URL
+          valueFrom:
+            configMapKeyRef:
+              key: SOLR_URL
+              name: {{ .Release.Name }}-env
+        - name: RAILS_ENV
+          value: production
+        - name: RAILS_LOG_TO_STDOUT
+          value: "true"
+        image: image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/tess:latest
+        imagePullPolicy: Always
+        name: container
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /code/config/tess.yml
+          name: tess-config
+          subPath: tess.yml
+        - mountPath: /code/config/secrets.yml
+          name: tess-config
+          subPath: secrets.yml
+        - mountPath: /code/config/ingestion.yml
+          name: tess-config
+          subPath: ingestion.yml
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: tess-config
+        secret:
+          defaultMode: 420
+          secretName: {{ .Release.Name }}-tess-config
+status: {}

@@ -1,0 +1,31 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    build: tess
+  name: {{ .Release.Name }}-tess-upstream
+spec:
+  failedBuildsHistoryLimit: 5
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {{ .Release.Name }}-tess:upstream
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    git:
+      uri: {{ .Values.git.uri }}
+    type: Git
+  strategy:
+    dockerStrategy:
+      env:
+      - name: CR
+        value: "True"
+    type: Docker
+  successfulBuildsHistoryLimit: 5
+  triggers:
+  - type: ImageChange
+  - type: ConfigChange
+status: {}

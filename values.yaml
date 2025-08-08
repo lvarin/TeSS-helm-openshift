@@ -1,0 +1,20 @@
+# Default values for TeSS.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+git:
+  #  uri: https://github.com/ElixirTeSS/TeSS.git
+  uri: https://github.com/lvarin/TeSS.git
+
+redis:
+  auth:
+    existingSecret: redis-password-secret
+    acl:
+      enabled: true
+      users:
+        - username: "tess"
+          enabled: "on"
+          commands: "+@all"
+          keys: "~*"
+          channels: "&*"
+      userSecret: redis-acl
