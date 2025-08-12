@@ -2,12 +2,36 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+base_url: # Add the URL where TeSS is goping to be deployed
+contact_email: # Add contact email
+
 git:
   #  uri: https://github.com/ElixirTeSS/TeSS.git
   uri: https://github.com/lvarin/TeSS.git
 
+postgres:
+  DB_HOST: postgresql
+  DB_NAME: sampledb
+  DB_USER: user
+  DB_PASSWORD: 
+    # Set a passwoord. you can use:
+    # python3 -c 'import secrets; print(secrets.token_hex(16))'
+  DB_PORT: "5432"
+  localenabled: true
+  IMAGE: quay.io/sclorg/postgresql-15-c9s # Only for local deployment
+  STORAGE: 1Gi        # Only for local deployment
+  MEMORY_LIMIT: 512Mi # Only for local deployment
+
+admin:
+  EMAIL: admin@localhost
+  PASSWORD: xE9VfK65lmiVOe7n
+  USERNAME: admin_user
+
+SECRET_KEY_BASE: J1N3R1cAbAlm7E1WDyaHlKZDeLF88s2s
+
 redis:
   auth:
+    redispassword: 66419bdc2ede76748ff1060e74e217d6
     existingSecret: redis-password-secret
     acl:
       enabled: true
@@ -17,4 +41,4 @@ redis:
           commands: "+@all"
           keys: "~*"
           channels: "&*"
-      userSecret: redis-acl
+            #userSecret: redis-acl

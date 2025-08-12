@@ -3,6 +3,7 @@ kind: Route
 metadata:
   name: {{ .Release.Name }}-tess
 spec:
+  host: {{ .Values.base_url }}
   port:
     targetPort: 3000
   tls:

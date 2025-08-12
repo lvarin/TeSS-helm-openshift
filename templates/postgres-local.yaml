@@ -1,0 +1,109 @@
+{{- if .Values.postgres.localenabled }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Values.postgres.DB_HOST }}
+stringData:
+  database-name: {{ .Values.postgres.DB_NAME }}
+  database-password: {{ .Values.postgres.DB_PASSWORD }}
+  database-user: {{ .Values.postgres.DB_USER }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    template.openshift.io/expose-uri: postgres://{.spec.clusterIP}:{.spec.ports[?(.name=="postgresql")].port}
+  name: {{ .Values.postgres.DB_HOST }}
+spec:
+  ports:
+  - name: postgresql
+    nodePort: 0
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    name: {{ .Values.postgres.DB_HOST }}
+  sessionAffinity: None
+  type: ClusterIP
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.postgres.DB_HOST }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.postgres.STORAGE }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.postgres.DB_HOST }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: {{ .Values.postgres.DB_HOST }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.postgres.DB_HOST }}
+    spec:
+      containers:
+      - env:
+        - name: POSTGRESQL_USER
+          valueFrom:
+            secretKeyRef:
+              key: database-user
+              name: {{ .Values.postgres.DB_HOST }}
+        - name: POSTGRESQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: database-password
+              name: {{ .Values.postgres.DB_HOST }}
+        - name: POSTGRESQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              key: database-name
+              name: {{ .Values.postgres.DB_HOST }}
+        image: {{ .Values.postgres.IMAGE }}
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - /usr/libexec/check-container
+            - --live
+          initialDelaySeconds: 120
+          timeoutSeconds: 10
+        name: postgresql
+        ports:
+        - containerPort: 5432
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - /usr/libexec/check-container
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+        resources:
+          limits:
+            memory: {{ .Values.postgres.MEMORY_LIMIT }}
+        securityContext:
+          capabilities: {}
+          privileged: false
+        terminationMessagePath: /dev/termination-log
+        volumeMounts:
+        - mountPath: /var/lib/pgsql/data
+          name: {{ .Values.postgres.DB_HOST }}-data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      volumes:
+      - name: {{ .Values.postgres.DB_HOST }}-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.postgres.DB_HOST }}
+{{ end }}

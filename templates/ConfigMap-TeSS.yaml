@@ -1,18 +1,18 @@
 apiVersion: v1
 data:
-  ADMIN_EMAIL: admin@localhost
-  ADMIN_PASSWORD: xE9VfK65lmiVOe7n
-  ADMIN_USERNAME: admin_user
-  DB_HOST: postgresql
-  DB_NAME: sampledb
-  DB_PASSWORD: hr0pUNkDY2BO1FVF
-  DB_PORT: "5432"
-  DB_USER: user
+  ADMIN_EMAIL: {{ .Values.admin.EMAIL }}
+  ADMIN_PASSWORD: {{ .Values.admin.PASSWORD }}
+  ADMIN_USERNAME: {{ .Values.admin.USERNAME }}
+  DB_HOST: {{ .Values.postgres.DB_HOST }}
+  DB_NAME: {{ .Values.postgres.DB_NAME }}
+  DB_PASSWORD: {{ .Values.postgres.DB_PASSWORD }}
+  DB_PORT: "{{ .Values.postgres.DB_PORT }}"
+  DB_USER: {{ .Values.postgres.DB_USER }}
   PREFIX: tess
-  REDIS_TEST_URL: redis://redis:6379/0
-  REDIS_URL: redis://redis:6379/1
-  SECRET_KEY_BASE: J1N3R1cAbAlm7E1WDyaHlKZDeLF88s2s
-  SOLR_URL: http://solr:8983/solr/tess
+  REDIS_TEST_URL: redis://{{ .Release.Name }}-redis-master:6379/0
+  REDIS_URL: redis://{{ .Release.Name }}-redis-master:6379/1
+  SECRET_KEY_BASE: {{ .Values.SECRET_KEY_BASE }}
+  SOLR_URL: http://{{ .Release.Name }}-solr:8983/solr/tess
 kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-env

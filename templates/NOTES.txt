@@ -1,3 +1,12 @@
-Deployed!
 
-At: ... 
+###############################################################################
+#
+# Deployed at: https://{{ .Values.base_url }}/
+#
+# Admin:
+#   Email:    '{{ .Values.admin.EMAIL }}'
+#   User:     '{{ .Values.admin.USERNAME }}'
+#   Password: '{{ .Values.admin.PASSWORD }}'
+#
+###############################################################################
+

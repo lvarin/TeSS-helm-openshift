@@ -97,7 +97,7 @@ spec:
           value: production
         - name: RAILS_LOG_TO_STDOUT
           value: "true"
-        image: image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/tess:latest
+        image: image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/{{ .Release.Name }}-tess:latest
         imagePullPolicy: Always
         name: container
         ports:
